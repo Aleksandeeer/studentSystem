@@ -40,10 +40,11 @@
             </thead>
         </tr>
 
+        <#--TODO: при создании нового студента не работает таблица оценок до перезапуска проги-->
         <#if student.dateList?size == 0>
             <tbody>
             <tr>
-                <td colspan="3">Оценки отсутствуют</td>
+                <td colspan="3">Оценки отсутствуют"</td>
             </tr>
             </tbody>
         <#else>
@@ -72,6 +73,30 @@
 <div id="form-container"></div>
 
 <script>
+    //TODO не отрабатывает метод
+    function checkValue() {
+        const inputValue = Number(document.getElementById("input2").value);
+        const validationMessage = validateInput(inputValue);
+
+        if (validationMessage) {
+            alert(validationMessage);
+        } else {
+            // Proceed to the next step
+            console.log("Input value is valid");
+        }
+    }
+
+    function validateInput(inputValue) {
+        const minValue = 1;
+        const maxValue = 5;
+
+        if (inputValue < minValue || inputValue > maxValue) {
+            return "Некорректная оценка";
+        }
+
+        return null;
+    }
+
     function createRow() {
         let form = document.createElement("form");
         form.action = "/student/insert/" + encodeURIComponent("${student.id}");
@@ -128,31 +153,6 @@
         //Добавление формы в контейнер
         let container = document.getElementById("form-container");
         container.appendChild(form);
-    }
-
-
-    //TODO не отрабатывает метод
-    function checkValue() {
-        const inputValue = Number(document.getElementById("input2").value);
-        const validationMessage = validateInput(inputValue);
-
-        if (validationMessage) {
-            alert(validationMessage);
-        } else {
-            // Proceed to the next step
-            console.log("Input value is valid");
-        }
-    }
-
-    function validateInput(inputValue) {
-        const minValue = 1;
-        const maxValue = 5;
-
-        if (inputValue < minValue || inputValue > maxValue) {
-            return "Некорректная оценка";
-        }
-
-        return null;
     }
 </script>
 

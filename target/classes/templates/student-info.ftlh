@@ -19,15 +19,15 @@
 <body>
 
 <div style="text-align: center;">
-<H1>Student</H1>
+    <H1>Student</H1>
 
-<hr>
+    <hr>
 
-<b>Имя: </b> ${student.name}<br/>
-<b>Фамилия: </b> ${student.surname}<br/>
-<b>Возраст: </b> ${student.age}<br/>
-<b>Город: </b> ${student.city}<br/>
-<b>Направление: </b> ${student.educationalDirection}<br/>
+    <b>Имя: </b> ${student.name}<br/>
+    <b>Фамилия: </b> ${student.surname}<br/>
+    <b>Возраст: </b> ${student.age}<br/>
+    <b>Город: </b> ${student.city}<br/>
+    <b>Направление: </b> ${student.educationalDirection}<br/>
 </div>
 
 <div class="table-wrapper">
@@ -40,10 +40,11 @@
             </thead>
         </tr>
 
+        <#--TODO: при создании нового студента не работает таблица оценок до перезапуска проги-->
         <#if student.dateList?size == 0>
             <tbody>
             <tr>
-                <td colspan="3">Оценки отсутствуют</td>
+                <td colspan="3">Оценки отсутствуют"</td>
             </tr>
             </tbody>
         <#else>
@@ -72,6 +73,30 @@
 <div id="form-container"></div>
 
 <script>
+    //TODO не отрабатывает метод
+    function checkValue() {
+        const inputValue = Number(document.getElementById("input2").value);
+        const validationMessage = validateInput(inputValue);
+
+        if (validationMessage) {
+            alert(validationMessage);
+        } else {
+            // Proceed to the next step
+            console.log("Input value is valid");
+        }
+    }
+
+    function validateInput(inputValue) {
+        const minValue = 1;
+        const maxValue = 5;
+
+        if (inputValue < minValue || inputValue > maxValue) {
+            return "Некорректная оценка";
+        }
+
+        return null;
+    }
+
     function createRow() {
         let form = document.createElement("form");
         form.action = "/student/insert/" + encodeURIComponent("${student.id}");
@@ -115,7 +140,7 @@
         button.textContent = "Сохранить";
         button.type = "submit";
         button.id = "submitButton"
-        button.class="addButton";
+        button.class = "addButton";
         button.addEventListener("click", checkValue)
 
         //Добавление всех элементов в форму
@@ -128,31 +153,6 @@
         //Добавление формы в контейнер
         let container = document.getElementById("form-container");
         container.appendChild(form);
-    }
-
-
-    //TODO не отрабатывает метод
-    function checkValue() {
-        const inputValue = Number(document.getElementById("input2").value);
-        const validationMessage = validateInput(inputValue);
-
-        if (validationMessage) {
-            alert(validationMessage);
-        } else {
-            // Proceed to the next step
-            console.log("Input value is valid");
-        }
-    }
-
-    function validateInput(inputValue) {
-        const minValue = 1;
-        const maxValue = 5;
-
-        if (inputValue < minValue || inputValue > maxValue) {
-            return "Некорректная оценка";
-        }
-
-        return null;
     }
 </script>
 

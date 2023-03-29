@@ -6,27 +6,60 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Students</title>
+
+    <#--css-->
+    <link rel="stylesheet" href="../css/table.css">
+    <link rel="stylesheet" href="../css/generalStyles.css">
+
 </head>
+
 <body>
-<H1>Students list</H1>
-<hr>
-<#list students as student>
-    <div>
-        <p>
-            <b>${student.name} ${student.surname} | </b>Возраст: ${student.age} | ID: ${student.id} <a
-                    href="/student/${student.id}">Подробнее...</a>
-        </p>
-    </div>
-</#list>
+
+<div style="text-align: center;">
+    <H1>Students list</H1>
+</div>
+
+<div class="table-wrapper">
+    <table class="fl-table">
+
+        <tr>
+            <thead>
+            <th>ID</th>
+            <th>Имя</th>
+            <th>Фамилия</th>
+            <th>Возраст</th>
+            </thead>
+        </tr>
+
+        <#list students as student>
+            <tbody>
+            <#attempt>
+                <tr>
+                    <th><a href="/student/${student.id}">${student.id}</a></th>
+                    <th>${student.name}</th>
+                    <th>${student.surname}</th>
+                    <th>${student.age}</th>
+                </tr>
+                <#recover>
+                    <tr>
+                        <td colspan="4">Ошибка</td>
+                    </tr>
+            </#attempt>
+            </tbody>
+        </#list>
+
+    </table>
+</div>
 
 <hr>
 
 <h2>Добавить нового студента</h2>
 
-<#--TODO сделать автоинкремент айдишника-->
+
+<#--TODO если поставить в айди disabled, то спринг не переваривает данные-->
 <form action="/student/create" method="post">
     ID: <label>
-        <input type="text" name="id"/>
+        <input type="text" name="id" value="<#if students?has_content>${students?last.id + 1}<#else>1</#if>"/>
     </label><br><br>
 
     Имя: <label>
