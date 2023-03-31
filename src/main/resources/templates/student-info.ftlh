@@ -81,8 +81,7 @@
         if (validationMessage) {
             alert(validationMessage);
         } else {
-            // Proceed to the next step
-            console.log("Input value is valid");
+            console.log("Невалидные данные");
         }
     }
 

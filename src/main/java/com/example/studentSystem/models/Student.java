@@ -14,7 +14,7 @@ public class Student {
     private int age;
     private String city;
     private String educationalDirection;
-    List<String> dateList;
-    List<String> subjectList;
-    List<Integer> markList;
+    public List<String> dateList;
+    public List<String> subjectList;
+    public List<Integer> markList;
 }

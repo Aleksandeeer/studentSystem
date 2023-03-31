@@ -67,10 +67,8 @@ public class Service {
             Statement stmtStudent = connToStudents.createStatement();
             ResultSet rsStudents = stmtStudent.executeQuery("SELECT * FROM student_table");
 
-            //TODO похерился SELECT оценок
             while (rsStudents.next()) {
                 Statement stmtMark = connToMarks.createStatement();
-                //TODO
                 ResultSet rsMarks = stmtMark.executeQuery("SELECT * FROM student" + ID);
 
                 List<String> dateList = new ArrayList<>();
@@ -98,7 +96,10 @@ public class Service {
     public List<Student> listStudents() {
         return studentList;
     }
-    public Set<String> listDirections(){return subjects.keySet();}
+
+    public Set<String> listDirections() {
+        return subjects.keySet();
+    }
 
     public Student getStudentById(int id) {
         for (Student student : studentList) {
@@ -163,24 +164,15 @@ public class Service {
 
     public void insertMark(String date, String subject, int mark, int id) {
         try {
-            ///TODO !!!переделать этот лютый костыль!!!-->
+            //Изменение студента
             Student student = getStudentById(id);
-
-            List<String> dateList = student.getDateList();
-            dateList.add(date);
-            student.setDateList(dateList);
-
-            List<String> subjectList = student.getSubjectList();
-            subjectList.add(subject);
-            student.setSubjectList(subjectList);
-
-            List<Integer> markList = student.getMarkList();
-            markList.add(mark);
-            student.setMarkList(markList);
+            student.markList.add(mark);
+            student.dateList.add(date);
+            student.subjectList.add(subject);
 
             studentList.set(studentList.indexOf(student), student);
-            ///TODO<--
 
+            //Инсёрт в базу
             String sqlInsert = "INSERT INTO student" + id + " VALUES(?,?,?)";
             PreparedStatement stmt = connToMarks.prepareStatement(sqlInsert);
             stmt.setString(1, date);
