@@ -44,7 +44,7 @@
         <#if student.dateList?size == 0>
             <tbody>
             <tr>
-                <td colspan="3">Оценки отсутствуют"</td>
+                <td colspan="3">Оценки отсутствуют</td>
             </tr>
             </tbody>
         <#else>

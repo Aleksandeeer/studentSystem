@@ -7,87 +7,67 @@ import java.util.*;
 
 @org.springframework.stereotype.Service
 public class Service {
-    //Конекшены к бдшкам
+    // Конекшены к бдшкам
     Connection connToStudents;
     Connection connToMarks;
     Connection connToSubjects;
 
-    //Ссылка на базу данных
-    String url_students = "jdbc:sqlite:student.db";
-    String url_marks = "jdbc:sqlite:mark.db";
-    String url_subjects = "jdbc:sqlite:subject.db";
+    // Ссылка на базу данных PostgreSQL
+    String url = "jdbc:postgresql://[::1]:5432/postgres";
+    String username = "postgres";
+    String password = "cricut760";
 
-    //Строки для SQL-запросов
-    String sqlInsert = "INSERT INTO student_table(id, name, surname, age, city, direction) VALUES(?,?,?,?,?,?)";
-    String sqlDelete = "DELETE FROM student_table WHERE id = ";
+    // Строки для SQL-запросов
+    String sqlInsert = "INSERT INTO student_table(name, surname, age, city, direction) VALUES(?,?,?,?,?)";
+    String sqlDelete = "DELETE FROM student_table WHERE id = ?";
     String sqlCreate;
 
-    //Список предметов
-    Map<String, String[]> subjects = new HashMap<>() {{
-        try {
-            //Лист предметами для каждого направления
-            List<String> subjects;
-
-            connToSubjects = DriverManager.getConnection(url_subjects);
-            Statement stmtDirection = connToSubjects.createStatement();
-            //Получение названий направлений
-            ResultSet rsDirection = stmtDirection.executeQuery("SELECT * FROM sqlite_master;");
-
-            //Перебор направленией
-            while (rsDirection.next()) {
-                subjects = new ArrayList<>();
-                String name = rsDirection.getString("name");
-
-                //Получение предметов направления
-                Statement stmtTempDirection = connToSubjects.createStatement();
-                ResultSet rsSubjects = stmtTempDirection.executeQuery("SELECT * FROM " + name);
-
-                //Перебор предметов направления
-                while (rsSubjects.next()) {
-                    subjects.add(rsSubjects.getString("name"));
-                }
-
-                put(name, subjects.toArray(new String[0]));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }};
-
-    int ID = 0;
+    // Список предметов
+    Map<String, String[]> subjects = new HashMap<>();
 
     private final List<Student> studentList = new ArrayList<>();
 
     {
         try {
-            ID = 1;
-            connToMarks = DriverManager.getConnection(url_marks);
-            connToStudents = DriverManager.getConnection(url_students);
+            connToStudents = DriverManager.getConnection(url, username, password);
+            connToMarks = DriverManager.getConnection(url, username, password);
+            connToSubjects = DriverManager.getConnection(url, username, password);
 
-            Statement stmtStudent = connToStudents.createStatement();
-            ResultSet rsStudents = stmtStudent.executeQuery("SELECT * FROM student_table");
+            // Получение списка предметов
+            Statement stmtSubjects = connToSubjects.createStatement();
+            ResultSet rsSubjects = stmtSubjects.executeQuery("SELECT DISTINCT direction_name FROM subject_table");
+
+            while (rsSubjects.next()) {
+                String directionName = rsSubjects.getString("direction_name");
+                Statement stmtDirection = connToSubjects.createStatement();
+                ResultSet rsDirection = stmtDirection.executeQuery("SELECT subject_name FROM subject_table WHERE direction_name='" + directionName + "'");
+                List<String> subjectList = new ArrayList<>();
+                while (rsDirection.next()) {
+                    subjectList.add(rsDirection.getString("subject_name"));
+                }
+                subjects.put(directionName, subjectList.toArray(new String[0]));
+            }
+
+            // Получение списка студентов
+            Statement stmtStudents = connToStudents.createStatement();
+            ResultSet rsStudents = stmtStudents.executeQuery("SELECT * FROM student_table");
 
             while (rsStudents.next()) {
-                Statement stmtMark = connToMarks.createStatement();
-                ResultSet rsMarks = stmtMark.executeQuery("SELECT * FROM student" + ID);
-
+                int id = rsStudents.getInt("id");
                 List<String> dateList = new ArrayList<>();
                 List<String> subjectList = new ArrayList<>();
                 List<Integer> markList = new ArrayList<>();
-
+                Statement stmtMarks = connToMarks.createStatement();
+                ResultSet rsMarks = stmtMarks.executeQuery("SELECT * FROM student" + id);
                 while (rsMarks.next()) {
                     dateList.add(rsMarks.getString("Date"));
                     subjectList.add(rsMarks.getString("Subject"));
                     markList.add(rsMarks.getInt("Mark"));
                 }
-
-                ID++;
-
-                studentList.add(new Student(rsStudents.getInt("id"), rsStudents.getString("name"), rsStudents.getString("surname"),
-                        rsStudents.getInt("age"), rsStudents.getString("city"), rsStudents.getString("direction"), dateList, subjectList, markList));
-
+                studentList.add(new Student(id, rsStudents.getString("name"), rsStudents.getString("surname"),
+                        rsStudents.getInt("age"), rsStudents.getString("city"), rsStudents.getString("direction"),
+                        dateList, subjectList, markList));
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -105,35 +85,39 @@ public class Service {
         for (Student student : studentList) {
             if (student.getId() == id) return student;
         }
-
         return null;
     }
 
     public void saveStudent(Student student) {
-        //Сохранение студента в БД
         try {
+            student.dateList = new ArrayList<String>();
+            student.subjectList = new ArrayList<String>();
+            student.markList = new ArrayList<Integer>();
             studentList.add(student);
 
-            //Запись данных о новом студенте в БД
-            PreparedStatement pstmt = connToStudents.prepareStatement(sqlInsert);
-
-            //Заполнение запроса данными
-            pstmt.setInt(1, student.getId());
-            pstmt.setString(2, student.getName());
-            pstmt.setString(3, student.getSurname());
-            pstmt.setInt(4, student.getAge());
-            pstmt.setString(5, student.getCity());
-            pstmt.setString(6, student.getEducationalDirection());
-
-            //Исполнение запроса
+            PreparedStatement pstmt = connToStudents.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS);
+            pstmt.setString(1, student.getName());
+            pstmt.setString(2, student.getSurname());
+            pstmt.setInt(3, student.getAge());
+            pstmt.setString(4, student.getCity());
+            pstmt.setString(5, student.getEducationalDirection());
             pstmt.executeUpdate();
+
+            ResultSet generatedKeys = pstmt.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                int id = generatedKeys.getInt(1);
+                student.setId(id);
+            }
+
             pstmt.close();
 
-            sqlCreate = "CREATE TABLE IF NOT EXISTS student" + student.getId() + " (Date TEXT, Subject TEXT, Mark INTEGER);";
+            sqlCreate = "CREATE TABLE IF NOT EXISTS student" + student.getId() + " (Date DATE, Subject VARCHAR(255), Mark INTEGER);";
 
             Statement stmt = connToMarks.createStatement();
             stmt.execute(sqlCreate);
             stmt.close();
+
+
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -141,39 +125,32 @@ public class Service {
     }
 
     public void deleteStudent(int id) {
-        //Удаление из листа
         studentList.removeIf(student -> student.getId() == id);
-        ID--;
 
-        //Удаление студента по id из БД
         try {
-            //Из всех студентов
-            PreparedStatement pstmt = connToStudents.prepareStatement(sqlDelete + id);
+            PreparedStatement pstmt = connToStudents.prepareStatement(sqlDelete);
+            pstmt.setInt(1, id);
             pstmt.executeUpdate();
             pstmt.close();
 
-            //Персональная таблица оценок
             Statement stmt = connToMarks.createStatement();
             stmt.execute("DROP TABLE IF EXISTS student" + id + ";");
             stmt.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 
     public void insertMark(String date, String subject, int mark, int id) {
         try {
-            //Изменение студента
             Student student = getStudentById(id);
-            student.markList.add(mark);
-            student.dateList.add(date);
-            student.subjectList.add(subject);
-
+            student.getMarkList().add(mark);
+            student.getDateList().add(date);
+            student.getSubjectList().add(subject);
             studentList.set(studentList.indexOf(student), student);
 
-            //Инсёрт в базу
-            String sqlInsert = "INSERT INTO student" + id + " VALUES(?,?,?)";
+            String sqlInsert = "INSERT INTO student" + id + " (Date, Subject, Mark) VALUES (?,?,?);";
+
             PreparedStatement stmt = connToMarks.prepareStatement(sqlInsert);
             stmt.setString(1, date);
             stmt.setString(2, subject);
@@ -181,12 +158,11 @@ public class Service {
             stmt.executeUpdate();
             stmt.close();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
     public String[] getSubjectsByDirection(String educationDirection) {
         return subjects.get(educationDirection);
     }
-
 }
