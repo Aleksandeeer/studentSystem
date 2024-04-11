@@ -2,17 +2,11 @@ package com.example.studentSystem.services;
 
 import com.example.studentSystem.models.Student;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.sql.*;
 import java.util.*;
 
 @org.springframework.stereotype.Service
 public class Service {
-    @PersistenceContext
-    private EntityManager entityManager;
-
-
     // Конекшены к бдшкам
     Connection connToStudents;
     Connection connToMarks;
@@ -96,9 +90,9 @@ public class Service {
 
     public void saveStudent(Student student) {
         try {
-            student.dateList = new ArrayList<String>();
-            student.subjectList = new ArrayList<String>();
-            student.markList = new ArrayList<Integer>();
+            student.dateList = new ArrayList<>();
+            student.subjectList = new ArrayList<>();
+            student.markList = new ArrayList<>();
             studentList.add(student);
 
             PreparedStatement pstmt = connToStudents.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS);
