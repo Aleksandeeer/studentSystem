@@ -2,11 +2,17 @@ package com.example.studentSystem.services;
 
 import com.example.studentSystem.models.Student;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.sql.*;
 import java.util.*;
 
 @org.springframework.stereotype.Service
 public class Service {
+    @PersistenceContext
+    private EntityManager entityManager;
+
+
     // Конекшены к бдшкам
     Connection connToStudents;
     Connection connToMarks;
@@ -111,14 +117,11 @@ public class Service {
 
             pstmt.close();
 
-            sqlCreate = "CREATE TABLE IF NOT EXISTS student" + student.getId() + " (Date DATE, Subject VARCHAR(255), Mark INTEGER);";
+            sqlCreate = "CREATE TABLE IF NOT EXISTS student" + student.getId() + " (Date VARCHAR(10), Subject VARCHAR(255), Mark INTEGER);";
 
             Statement stmt = connToMarks.createStatement();
             stmt.execute(sqlCreate);
             stmt.close();
-
-
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
