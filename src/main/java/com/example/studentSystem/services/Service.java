@@ -19,7 +19,7 @@ public class Service {
     // Ссылка на базу данных PostgreSQL
     String url = "jdbc:postgresql://[::1]:5432/postgres";
     String username = "postgres";
-    String password = "---";
+    String password = "cricut760";
 
     // Строки для SQL-запросов
     String sqlInsert = "INSERT INTO student_table(name, surname, age, city, direction) VALUES(?,?,?,?,?)";
@@ -157,6 +157,9 @@ public class Service {
             while(rsUsers.next()) {
                 if (rsUsers.getString("UserLogin").equals(user.getUserLogin()) &&
                         rsUsers.getString("UserPasswordSHA256").equals(user.getUserPasswordSHA256())) {
+                    // Дополнительно устанавливаем роль
+                    user.setUserRole(rsUsers.getString("UserRole"));
+                    // Успешный вход = true
                     status = true;
                     break;
                 }
@@ -164,8 +167,6 @@ public class Service {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
-
 
         return status;
     }

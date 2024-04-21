@@ -8,4 +8,5 @@ import lombok.Data;
 public class User {
     String UserLogin;
     String UserPasswordSHA256;
+    String UserRole;
 }

@@ -134,7 +134,7 @@
         input2.name = "Mark"
         input2.id = "Mark";
 
-        //Сохранить
+        // Сохранить
         let button = document.createElement("button");
         button.textContent = "Сохранить";
         button.type = "submit";
@@ -159,9 +159,24 @@
 <hr>
 <br>
 
-<form action="/student/delete/${student.id}" method="post">
-    <input type="submit" value="Удалить студента"/>
-</form>
+<#if isAdmin == 1>
+    <form action="/student/delete/${student.id}" method="post">
+        <input type="submit" value="Удалить студента"/>
+    </form>
+<#else>
+    <div style="background-color: rgba(217, 237, 247, 1);
+                color: rgba(49, 112, 143, 1);
+                border-color: rgba(126, 182, 193, 1);
+                width: 25%;
+                padding: 12px 16px;
+                border-radius: 4px;
+                border-style: solid;
+                border-width: 1px;
+                font-size: 16px;">
+        Обратитесь к администратору для изменения списка студентов
+    </div>
+</#if>
+
 
 </body>
 </html>
