@@ -19,7 +19,7 @@ public class Service {
     // Ссылка на базу данных PostgreSQL
     String url = "jdbc:postgresql://[::1]:5432/postgres";
     String username = "postgres";
-    String password = "cricut760";
+    String password = "---";
 
     // Строки для SQL-запросов
     String sqlInsert = "INSERT INTO student_table(name, surname, age, city, direction) VALUES(?,?,?,?,?)";

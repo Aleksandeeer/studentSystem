@@ -87,5 +87,4 @@ public class Controller {
     public String[] getSubjects(@RequestParam("direction") String educationDirection) {
         return service.getSubjectsByDirection(educationDirection);
     }
-
 }
