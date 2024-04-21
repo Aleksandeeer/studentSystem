@@ -1,7 +1,10 @@
 package com.example.studentSystem.services;
 
 import com.example.studentSystem.models.Student;
+import com.example.studentSystem.models.User;
+import com.google.common.hash.Hashing;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.*;
 
@@ -11,6 +14,7 @@ public class Service {
     Connection connToStudents;
     Connection connToMarks;
     Connection connToSubjects;
+    Connection connToUsers;
 
     // Ссылка на базу данных PostgreSQL
     String url = "jdbc:postgresql://[::1]:5432/postgres";
@@ -136,6 +140,34 @@ public class Service {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isUserValid(User user) {
+        boolean status = false;
+
+        // SHA-256 encryption
+        user.setUserPasswordSHA256(Hashing.sha256()
+                .hashString(user.getUserPasswordSHA256(), StandardCharsets.UTF_8)
+                .toString());
+
+        try {
+            connToUsers = DriverManager.getConnection(url, username, password);
+            Statement stmtUsers = connToUsers.createStatement();
+            ResultSet rsUsers = stmtUsers.executeQuery("SELECT * FROM Users");
+            while(rsUsers.next()) {
+                if (rsUsers.getString("UserLogin").equals(user.getUserLogin()) &&
+                        rsUsers.getString("UserPasswordSHA256").equals(user.getUserPasswordSHA256())) {
+                    status = true;
+                    break;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+
+
+        return status;
     }
 
     public void insertMark(String date, String subject, int mark, int id) {

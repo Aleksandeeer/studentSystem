@@ -1,6 +1,7 @@
 package com.example.studentSystem.controllers;
 
 import com.example.studentSystem.models.Student;
+import com.example.studentSystem.models.User;
 import com.example.studentSystem.services.Service;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,12 +13,32 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class Controller {
     private final Service service;
+    private boolean status = false;
 
+    @PostMapping("/login")
+    public String login(Model model, User user) {
+        status = service.isUserValid(user);
+        if (status){
+            model.addAttribute("students", service.listStudents());
+            model.addAttribute("directions", service.listDirections());
+            return students(model);
+        } else {
+            return "login";
+        }
+//        model.addAttribute("students", service.listStudents());
+//        model.addAttribute("directions", service.listDirections());
+//        return "login";
+    }
     @GetMapping("/")
     public String students(Model model) {
-        model.addAttribute("students", service.listStudents());
-        model.addAttribute("directions", service.listDirections());
-        return "students";
+        // Проверка на обход странички логина
+        if (status) {
+            model.addAttribute("students", service.listStudents());
+            model.addAttribute("directions", service.listDirections());
+            return "students";
+        } else {
+            return "login";
+        }
     }
 
     @GetMapping("/student/{id}")

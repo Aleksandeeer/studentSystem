@@ -10,12 +10,16 @@
     <#--css-->
     <link rel="stylesheet" href="../css/table.css">
     <link rel="stylesheet" href="../css/generalStyles.css">
+    <link rel="stylesheet" href="../css/input_type_text.css">
 
 </head>
 
 <body>
-
-<div style="text-align: center;">
+<img src="https://eng.kpfu.ru/wp-content/uploads/2021/01/kfu-gerb-chb.jpg" height="100">
+<div style="text-align: center; display: inline; margin-left: 490px">
+    <img src="https://cdn0.iconfinder.com/data/icons/users-android-l-lollipop-icon-pack/24/student-256.png" alt="student_logo" width="100" height="100">
+    <img src="https://cdn4.iconfinder.com/data/icons/wirecons-free-vector-icons/32/book-256.png" alt="student_logo" width="100" height="100">
+    <img src="https://cdn2.iconfinder.com/data/icons/asic/50/SLA-256.png" alt="student_logo" width="100" height="100">
     <H1>Students list</H1>
 </div>
 
@@ -59,11 +63,11 @@
 <#--TODO если поставить в айди disabled, то спринг не переваривает данные-->
 <form action="/student/create" method="post">
     ID: <label>
-        <input type="text" name="id" value="<#if students?has_content>${students?last.id + 1}<#else>1</#if>"/>
+        <input type="text" style="margin-left: 51px" name="id" value="<#if students?has_content>${students?last.id + 1}<#else>1</#if>"/>
     </label><br><br>
 
     Имя: <label>
-        <input type="text" name="name"/>
+        <input type="text" style="margin-left: 36px" name="name"/>
     </label><br><br>
 
     Фамилия: <label>
@@ -71,15 +75,15 @@
     </label><br><br>
 
     Возраст: <label>
-        <input type="number" name="age"/>
+        <input type="number" style="margin-left: 7px" name="age"/>
     </label><br><br>
 
     Город: <label>
-        <input type="text" name="city"/>
+        <input type="text" style="margin-left: 24px" name="city"/>
     </label><br><br>
 
     <label>
-        <select name="educationalDirection" required="required">
+        <select class="select-css" name="educationalDirection" required="required">
             <#list directions as direction>
                 <option value="${direction}">${direction}</option>
             </#list>
