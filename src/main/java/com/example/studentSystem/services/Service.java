@@ -10,27 +10,22 @@ import java.util.*;
 
 @org.springframework.stereotype.Service
 public class Service {
+    // Ссылка на базу данных PostgreSQL
+    private final String url = "jdbc:postgresql://[::1]:5432/postgres";
+    private final String username = "postgres";
+    private final String password = "cricut760";
+    private final List<Student> studentList = new ArrayList<>();
     // Конекшены к бдшкам
     Connection connToStudents;
     Connection connToMarks;
     Connection connToSubjects;
     Connection connToUsers;
-
-    // Ссылка на базу данных PostgreSQL
-    private final String url = "jdbc:postgresql://[::1]:5432/postgres";
-    private final String username = "postgres";
-
-    private final String password = "cricut760";
-
     // Строки для SQL-запросов
     String sqlInsert = "INSERT INTO student_table(name, surname, age, city, direction) VALUES(?,?,?,?,?)";
     String sqlDelete = "DELETE FROM student_table WHERE id = ?";
     String sqlCreate;
-
     // Список предметов
     Map<String, String[]> subjects = new HashMap<>();
-
-    private final List<Student> studentList = new ArrayList<>();
 
     {
         try {

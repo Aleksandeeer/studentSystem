@@ -3,7 +3,6 @@ package com.example.studentSystem.controllers;
 import com.example.studentSystem.models.Student;
 import com.example.studentSystem.models.User;
 import com.example.studentSystem.services.Service;
-
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ui.Model;
@@ -19,6 +18,7 @@ public class Controller {
     // 0 - USER (PARENT AND CHILD) - только просмотр оценок
 
     private boolean status = false;
+
     public int codeRole() {
         return codeRole;
     }
@@ -26,7 +26,7 @@ public class Controller {
     @PostMapping("/login")
     public String login(Model model, User user) {
         status = service.isUserValid(user);
-        if (status){
+        if (status) {
             // 2 - ADMIN - полный доступ
             // 1 - TEACHER - только добавление оценок
             // 0 - USER (PARENT AND STUDENT) - только просмотр оценок
@@ -45,6 +45,7 @@ public class Controller {
             return "login";
         }
     }
+
     @GetMapping("/")
     public String students(Model model) {
         // Проверка на обход странички логина
