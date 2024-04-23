@@ -25,6 +25,14 @@
     <H1>Students list</H1>
 </div>
 
+<#if codeRole == 1>
+    <h3><span style="font-size: x-large; color: #ffca00; font-family: serif; ">TEACHER ACCESS</span></h3>
+<#elseif codeRole == 2>
+    <h3><span style="font-size: x-large; color: #308c00; font-family: serif; ">ADMIN ACCESS</span></h3>
+<#elseif codeRole == 0>
+    <h3><span style="font-size: x-large; color: #ff769a; font-family: serif; ">GUESS ACCESS</span></h3>
+</#if>
+
 <div class="table-wrapper">
     <table class="fl-table">
 
@@ -36,34 +44,51 @@
             <th>Возраст</th>
             </thead>
         </tr>
-
-        <#list students as student>
-            <tbody>
-            <#attempt>
-                <tr>
-                    <th><a href="/student/${student.id}">${student.id}</a></th>
-                    <th>${student.name}</th>
-                    <th>${student.surname}</th>
-                    <th>${student.age}</th>
-                </tr>
-                <#recover>
+        <#if codeRole == 1 || codeRole == 2>
+            <#list students as student>
+                <tbody>
+                <#attempt>
                     <tr>
-                        <td colspan="4">Ошибка</td>
+                        <th><a href="/student/${student.id}">${student.id}</a></th>
+                        <th>${student.name}</th>
+                        <th>${student.surname}</th>
+                        <th>${student.age}</th>
                     </tr>
-            </#attempt>
-            </tbody>
-        </#list>
+                    <#recover>
+                        <tr>
+                            <td colspan="4">Ошибка</td>
+                        </tr>
+                </#attempt>
+                </tbody>
+            </#list>
+        <#elseif codeRole == 0>
+            <#list students as student>
+                <tbody>
+                <#attempt>
+                    <#if user.studentID == student.id>
+                        <tr>
+                            <th><a href="/student/${student.id}">${student.id}</a></th>
+                            <th>${student.name}</th>
+                            <th>${student.surname}</th>
+                            <th>${student.age}</th>
+                        </tr>
+                    </#if>
+                    <#recover>
+                        <tr>
+                            <td colspan="4">Ошибка</td>
+                        </tr>
+                </#attempt>
+                </tbody>
+            </#list>
+        </#if>
 
     </table>
 </div>
 
 <hr>
 
-<h2>Добавить нового студента</h2>
-
-
-<#--TODO если поставить в айди disabled, то спринг не переваривает данные-->
-<#if isAdmin == 1>
+<#if codeRole == 2>
+    <h2>Добавить нового студента</h2>
     <form action="/student/create" method="post">
         ID: <label>
             <input type="text" style="margin-left: 51px" name="id"
@@ -96,7 +121,7 @@
 
         <input type="submit" value="Добавить студента"/>
     </form>
-<#else>
+<#elseif codeRole == 1>
     <div style="background-color: rgba(217, 237, 247, 1);
                 color: rgba(49, 112, 143, 1);
                 border-color: rgba(126, 182, 193, 1);
@@ -107,6 +132,18 @@
                 border-width: 1px;
                 font-size: 16px;">
         Обратитесь к администратору для изменения списка студентов
+    </div>
+<#elseif codeRole == 0>
+    <div style="background-color: rgba(217, 237, 247, 1);
+                color: rgba(49, 112, 143, 1);
+                border-color: rgba(126, 182, 193, 1);
+                width: 25%;
+                padding: 12px 16px;
+                border-radius: 4px;
+                border-style: solid;
+                border-width: 1px;
+                font-size: 16px;">
+        Просмотр оценок
     </div>
 </#if>
 

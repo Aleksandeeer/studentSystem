@@ -11,7 +11,7 @@ public class StudentSystemApplication {
 
 	public static void main(String[] args) {
 //		System.out.println(Hashing.sha256()
-//				.hashString("temp", StandardCharsets.UTF_8)
+//				.hashString("temp2", StandardCharsets.UTF_8)
 //				.toString());
 		SpringApplication.run(StudentSystemApplication.class, args);
 	}

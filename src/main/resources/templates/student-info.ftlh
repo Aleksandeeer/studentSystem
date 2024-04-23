@@ -69,101 +69,104 @@
     </table>
 </div>
 
-<button onclick="createRow()">Добавить запись</button>
-<div id="form-container"></div>
+<#-- codeRole == 1 || codeRole == 2 -> Можно добавить запись -->
+<#if codeRole == 1 || codeRole == 2>
+    <button onclick="createRow()">Добавить запись</button>
+    <div id="form-container"></div>
 
-<script>
-    //TODO не отрабатывает метод
-    function checkValue() {
-        const inputValue = Number(document.getElementById("input2").value);
-        const validationMessage = validateInput(inputValue);
+    <script>
+        //TODO не отрабатывает метод
+        function checkValue() {
+            const inputValue = Number(document.getElementById("input2").value);
+            const validationMessage = validateInput(inputValue);
 
-        if (validationMessage) {
-            alert(validationMessage);
-        } else {
-            console.log("Невалидные данные");
-        }
-    }
-
-    function validateInput(inputValue) {
-        const minValue = 1;
-        const maxValue = 5;
-
-        if (inputValue < minValue || inputValue > maxValue) {
-            return "Некорректная оценка";
-        }
-
-        return null;
-    }
-
-    function createRow() {
-        let form = document.createElement("form");
-        form.action = "/student/insert/" + encodeURIComponent("${student.id}");
-        form.method = "post";
-
-        //Дата
-        let input1 = document.createElement("input");
-        input1.type = "text";
-        input1.placeholder = "Date";
-        input1.name = "Date";
-        input1.id = "Date";
-
-        //Выбор предмета из выпадающего списка в соответствии с учебным направлением
-        let select = document.createElement("select");
-        select.id = "Subject";
-        select.name = "Subject";
-        let xhr = new XMLHttpRequest();
-        xhr.open("GET", "/subjects?direction=" + encodeURIComponent("${student.educationalDirection}"));
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                let data = JSON.parse(xhr.responseText);
-                for (let i = 0; i < data.length; i++) {
-                    let option = document.createElement("option");
-                    option.value = data[i];
-                    option.text = data[i];
-                    select.add(option);
-                }
+            if (validationMessage) {
+                alert(validationMessage);
+            } else {
+                console.log("Невалидные данные");
             }
-        };
-        xhr.send();
+        }
 
-        //Оценка
-        let input2 = document.createElement("input");
-        input2.type = "text";
-        input2.placeholder = "Mark";
-        input2.name = "Mark"
-        input2.id = "Mark";
+        function validateInput(inputValue) {
+            const minValue = 1;
+            const maxValue = 5;
 
-        // Сохранить
-        let button = document.createElement("button");
-        button.textContent = "Сохранить";
-        button.type = "submit";
-        button.id = "submitButton"
-        button.class = "addButton";
-        button.addEventListener("click", checkValue)
+            if (inputValue < minValue || inputValue > maxValue) {
+                return "Некорректная оценка";
+            }
 
-        //Добавление всех элементов в форму
-        form.appendChild(input1);
-        form.appendChild(select);
-        form.appendChild(input2);
-        form.appendChild(document.createElement("br"));
-        form.appendChild(button);
+            return null;
+        }
 
-        //Добавление формы в контейнер
-        let container = document.getElementById("form-container");
-        container.appendChild(form);
-    }
-</script>
+        function createRow() {
+            let form = document.createElement("form");
+            form.action = "/student/insert/" + encodeURIComponent("${student.id}");
+            form.method = "post";
+
+            //Дата
+            let input1 = document.createElement("input");
+            input1.type = "text";
+            input1.placeholder = "Date";
+            input1.name = "Date";
+            input1.id = "Date";
+
+            //Выбор предмета из выпадающего списка в соответствии с учебным направлением
+            let select = document.createElement("select");
+            select.id = "Subject";
+            select.name = "Subject";
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", "/subjects?direction=" + encodeURIComponent("${student.educationalDirection}"));
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    let data = JSON.parse(xhr.responseText);
+                    for (let i = 0; i < data.length; i++) {
+                        let option = document.createElement("option");
+                        option.value = data[i];
+                        option.text = data[i];
+                        select.add(option);
+                    }
+                }
+            };
+            xhr.send();
+
+            //Оценка
+            let input2 = document.createElement("input");
+            input2.type = "text";
+            input2.placeholder = "Mark";
+            input2.name = "Mark"
+            input2.id = "Mark";
+
+            // Сохранить
+            let button = document.createElement("button");
+            button.textContent = "Сохранить";
+            button.type = "submit";
+            button.id = "submitButton"
+            button.class = "addButton";
+            button.addEventListener("click", checkValue)
+
+            //Добавление всех элементов в форму
+            form.appendChild(input1);
+            form.appendChild(select);
+            form.appendChild(input2);
+            form.appendChild(document.createElement("br"));
+            form.appendChild(button);
+
+            //Добавление формы в контейнер
+            let container = document.getElementById("form-container");
+            container.appendChild(form);
+        }
+    </script>
+</#if>
 
 <br>
 <hr>
 <br>
 
-<#if isAdmin == 1>
+<#if codeRole == 2>
     <form action="/student/delete/${student.id}" method="post">
         <input type="submit" value="Удалить студента"/>
     </form>
-<#else>
+<#elseif codeRole == 1>
     <div style="background-color: rgba(217, 237, 247, 1);
                 color: rgba(49, 112, 143, 1);
                 border-color: rgba(126, 182, 193, 1);
@@ -174,6 +177,18 @@
                 border-width: 1px;
                 font-size: 16px;">
         Обратитесь к администратору для изменения списка студентов
+    </div>
+<#elseif codeRole == 0>
+    <div style="background-color: rgba(217, 237, 247, 1);
+                color: rgba(49, 112, 143, 1);
+                border-color: rgba(126, 182, 193, 1);
+                width: 25%;
+                padding: 12px 16px;
+                border-radius: 4px;
+                border-style: solid;
+                border-width: 1px;
+                font-size: 16px;">
+        Просмотр оценок
     </div>
 </#if>
 

@@ -17,9 +17,10 @@ public class Service {
     Connection connToUsers;
 
     // Ссылка на базу данных PostgreSQL
-    String url = "jdbc:postgresql://[::1]:5432/postgres";
-    String username = "postgres";
-    String password = "---";
+    private final String url = "jdbc:postgresql://[::1]:5432/postgres";
+    private final String username = "postgres";
+
+    private final String password = "cricut760";
 
     // Строки для SQL-запросов
     String sqlInsert = "INSERT INTO student_table(name, surname, age, city, direction) VALUES(?,?,?,?,?)";
@@ -154,11 +155,12 @@ public class Service {
             connToUsers = DriverManager.getConnection(url, username, password);
             Statement stmtUsers = connToUsers.createStatement();
             ResultSet rsUsers = stmtUsers.executeQuery("SELECT * FROM Users");
-            while(rsUsers.next()) {
+            while (rsUsers.next()) {
                 if (rsUsers.getString("UserLogin").equals(user.getUserLogin()) &&
                         rsUsers.getString("UserPasswordSHA256").equals(user.getUserPasswordSHA256())) {
-                    // Дополнительно устанавливаем роль
+                    // Дополнительно устанавливаем роль и студента для отображения
                     user.setUserRole(rsUsers.getString("UserRole"));
+                    user.setStudentID(rsUsers.getInt("StudentID"));
                     // Успешный вход = true
                     status = true;
                     break;
