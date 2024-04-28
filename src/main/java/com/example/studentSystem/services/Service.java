@@ -15,18 +15,20 @@ public class Service {
     private final String username = "postgres";
     private final String password = "cricut760";
     private final List<Student> studentList = new ArrayList<>();
+    private final List<User> teacherList = new ArrayList<>();
     // Конекшены к бдшкам
     Connection connToStudents;
     Connection connToMarks;
     Connection connToSubjects;
     Connection connToUsers;
+
     // Строки для SQL-запросов
     String sqlInsert = "INSERT INTO student_table(name, surname, age, city, direction) VALUES(?,?,?,?,?)";
+    String sqlInsertUser = "INSERT INTO Users(UserID, StudentID, UserLogin, UserPasswordSHA256, UserRole) VALUES (?, ?, ?, ?, ?)";
     String sqlDelete = "DELETE FROM student_table WHERE id = ?";
     String sqlCreate;
     // Список предметов
     Map<String, String[]> subjects = new HashMap<>();
-
     {
         try {
             connToStudents = DriverManager.getConnection(url, username, password);
@@ -68,6 +70,23 @@ public class Service {
                         rsStudents.getInt("age"), rsStudents.getString("city"), rsStudents.getString("direction"),
                         dateList, subjectList, markList));
             }
+
+            // Получение списка учителей
+            Statement stmtTeachers = connToStudents.createStatement();
+            ResultSet rsTeachers = stmtStudents.executeQuery("SELECT * FROM Users;");
+            while(rsTeachers.next()) {
+                if(rsTeachers.getString("UserRole").equals("teacher")) {
+                    User temp_user = new User(rsTeachers.getString("UserLogin"),
+                            rsTeachers.getString("UserPasswordSHA256"),
+                            rsTeachers.getString("UserRole"));
+                    temp_user.setStudentID(0);
+                    teacherList.add(temp_user);
+                }
+            }
+
+            stmtTeachers.close();
+            stmtStudents.close();
+            stmtSubjects.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -81,6 +100,9 @@ public class Service {
         return subjects.keySet();
     }
 
+    public List<User> listTeacher() {
+        return teacherList;
+    }
     public Student getStudentById(int id) {
         for (Student student : studentList) {
             if (student.getId() == id) return student;
@@ -118,6 +140,37 @@ public class Service {
             stmt.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void saveTeacher(User user) {
+
+        try {
+            Statement stmtTeachers = connToUsers.createStatement();
+            ResultSet rsTeachers = stmtTeachers.executeQuery("SELECT COUNT(*) as user_count FROM Users;");
+            rsTeachers.next();
+
+            User user_teacher = new User(user.getUserLogin(), Hashing.sha256()
+				.hashString(user.getUserPasswordSHA256(), StandardCharsets.UTF_8)
+				.toString(), user.getUserRole());
+
+            user.setUserPasswordSHA256(Hashing.sha256()
+                    .hashString(user.getUserPasswordSHA256(), StandardCharsets.UTF_8)
+                    .toString());
+            teacherList.add(user_teacher);
+
+            PreparedStatement pstmt = connToUsers.prepareStatement(sqlInsertUser, Statement.RETURN_GENERATED_KEYS);
+            pstmt.setInt(1, rsTeachers.getInt("user_count") + 1);
+            pstmt.setInt(2, user.getStudentID());
+            pstmt.setString(3, user.getUserLogin());
+            pstmt.setString(4, user.getUserPasswordSHA256());
+            pstmt.setString(5, user.getUserRole());
+            pstmt.executeUpdate();
+            stmtTeachers.close();
+
+            pstmt.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -161,6 +214,8 @@ public class Service {
                     break;
                 }
             }
+
+            stmtUsers.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

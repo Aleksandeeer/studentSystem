@@ -23,6 +23,7 @@
          width="100" height="100">
     <img src="https://cdn2.iconfinder.com/data/icons/asic/50/SLA-256.png" alt="student_logo" width="100" height="100">
     <H1>Students list</H1>
+
 </div>
 
 <#if codeRole == 1>
@@ -121,6 +122,9 @@
 
         <input type="submit" value="Добавить студента"/>
     </form>
+
+    <th><a href="/teacher">Добавить учителя</a></th>
+
 <#elseif codeRole == 1>
     <div style="background-color: rgba(217, 237, 247, 1);
                 color: rgba(49, 112, 143, 1);

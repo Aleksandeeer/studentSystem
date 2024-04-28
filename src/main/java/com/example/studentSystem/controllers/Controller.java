@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @org.springframework.stereotype.Controller
 @RequiredArgsConstructor
 public class Controller {
@@ -59,6 +61,28 @@ public class Controller {
         }
     }
 
+    @GetMapping("/teacher")
+    public String add_teacher(Model model) {
+        List<User> listTeacher = service.listTeacher();
+//        for (User user : listTeacher) {
+//            System.out.println("Login: " + user.getUserLogin());
+//            System.out.println("Password: " + user.getUserPasswordSHA256());
+//            System.out.println("Role: " + user.getUserRole());
+//            System.out.println("StudentID: " + user.getStudentID());
+//            System.out.println("CLASS -> " + user.getClass());
+//        }
+
+        if (codeRole == 2 && status) {
+            model.addAttribute("teachers", service.listTeacher());
+            model.addAttribute("codeRole", codeRole());
+            return "teacher";
+        } else {
+            status = false;
+            codeRole = 0;
+            return "login";
+        }
+    }
+
     @GetMapping("/student/{id}")
     public String studentInfo(@PathVariable int id, Model model) {
         model.addAttribute("codeRole", codeRole());
@@ -70,6 +94,17 @@ public class Controller {
     public String createStudent(Student student, Model model) {
         model.addAttribute("codeRole", codeRole());
         service.saveStudent(student);
+        return "redirect:/";
+    }
+
+    @PostMapping("/teacher/create")
+    public String createTeacher(User user, Model model) {
+        // Установка оставшихся параметров (по факту установка по умолчанию для данного кейса)
+        user.setStudentID(0);
+        user.setUserRole("teacher");
+
+        model.addAttribute("codeRole", codeRole());
+        service.saveTeacher(user);
         return "redirect:/";
     }
 

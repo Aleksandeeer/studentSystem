@@ -19,5 +19,4 @@ public class User {
         this.UserPasswordSHA256 = UserPasswordSHA256;
         this.UserRole = UserRole;
     }
-
 }
