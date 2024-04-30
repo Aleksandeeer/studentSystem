@@ -45,6 +45,7 @@
             <th>Возраст</th>
             </thead>
         </tr>
+
         <#if codeRole == 1 || codeRole == 2>
             <#list students as student>
                 <tbody>

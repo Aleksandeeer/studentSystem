@@ -61,7 +61,7 @@
     </label><br><br>
 
     Пароль: <label>
-        <input type="text" name="UserPasswordSHA256"/>
+        <input type="password" name="UserPasswordSHA256"/>
     </label><br><br>
 
     <input style="margin-top: 20px;" type="submit" value="Добавить учителя"/>
