@@ -13,7 +13,7 @@ public class Service {
     // Ссылка на базу данных PostgreSQL
     private final String url = "jdbc:postgresql://[::1]:5432/postgres";
     private final String username = "postgres";
-    private final String password = "cricut760";
+    private final String password = "---";
     private final List<Student> studentList = new ArrayList<>();
     private final List<User> teacherList = new ArrayList<>();
     // Конекшены к бдшкам
