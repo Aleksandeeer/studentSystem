@@ -44,10 +44,12 @@ public class Controller {
     @PostMapping("/login")
     public String login(Model model, User user, HttpServletResponse response, HttpServletRequest request) {
         status = service.isUserValid(user);
+        codeRole = 0;
         if (status) {
             // * 2 - ADMIN - полный доступ
             // * 1 - TEACHER - только добавление оценок
             // * 0 - USER (PARENT AND STUDENT) - только просмотр оценок
+            System.out.println("ROLE: " + user.getUserRole());
             switch (user.getUserRole()) {
                 case "admin" -> codeRole = 2;
                 case "teacher" -> codeRole = 1;
@@ -86,15 +88,18 @@ public class Controller {
             }
         }
 
+        String answer_page;
+
         // Проверка на обход странички логина
         if (status) {
             model.addAttribute("codeRole", userRole);
             model.addAttribute("students", service.listStudents());
             model.addAttribute("directions", service.listDirections());
-            return "students";
-        } else {
-            return "login";
-        }
+            answer_page = "students";
+        } else
+            answer_page = "login";
+
+        return answer_page;
     }
 
     @GetMapping("/teacher")
@@ -104,18 +109,22 @@ public class Controller {
         // ? Использование CACHE
         int Role = Integer.parseInt(getFromCache("codeRole"));
 
+        String answer_page;
+
         if (Role == 2 && status) {
             model.addAttribute("teachers", service.listTeacher());
             model.addAttribute("codeRole", codeRole());
             // ? Использование SESSION
             HttpSession session = request.getSession();
             session.setAttribute("codeRole", codeRole());
-            return "teacher";
+            answer_page = "teacher";
         } else {
             status = false;
             codeRole = 0;
-            return "login";
+            answer_page = "login";
         }
+
+        return answer_page;
     }
 
     @GetMapping("/student/{id}")
@@ -180,10 +189,12 @@ public class Controller {
             }
         }
 
+        String[] subjects = null;
+
         if (userRole == 0 || userRole == 1 || userRole == 2)
-            return service.getSubjectsByDirection(educationDirection);
-        else
-            return null;
+            subjects = service.getSubjectsByDirection(educationDirection);
+
+        return subjects;
     }
 
     // ? Использование CACHE

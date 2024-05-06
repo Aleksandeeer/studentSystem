@@ -31,7 +31,7 @@
 <#elseif codeRole == 2>
     <h3><span style="font-size: x-large; color: #308c00; font-family: serif; ">ADMIN ACCESS</span></h3>
 <#elseif codeRole == 0>
-    <h3><span style="font-size: x-large; color: #ff769a; font-family: serif; ">GUESS ACCESS</span></h3>
+    <h3><span style="font-size: x-large; color: #ff769a; font-family: serif; ">STUDENT/PARENT ACCESS</span></h3>
 </#if>
 
 <div class="table-wrapper">
